@@ -2,6 +2,20 @@ void_chest = {
 	show_particles = (minetest.settings:get("void_chest.show_particles") ~= "false")
 }
 
+minetest.register_allow_player_inventory_action(function(player, action, inv, info)
+	if inv:get_location().type == "player" and (
+		   action == "move" and (info.from_list == "void_chest:void_chest" or info.to_list == "void_chest:void_chest")
+		or action == "put"  and  info.listname  == "void_chest:void_chest"
+		or action == "take" and  info.listname  == "void_chest:void_chest"
+	) then
+		local def = player:get_wielded_item():get_definition()
+
+		if not minetest.find_node_near(player:get_pos(), def and def.range or ItemStack():get_definition().range, "void_chest:void_chest", true) then
+			return 0
+		end
+	end
+end)
+
 -- Register the void chest.
 minetest.register_node("void_chest:void_chest", {
 	description = "" ..core.colorize("#660099","Void Chest\n") ..core.colorize("#FFFFFF", "Use the power of the void to store your items."),
